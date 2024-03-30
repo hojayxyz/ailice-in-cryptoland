@@ -4,3 +4,5 @@ node_modules
 dist
 stored_data.json
 myFile.wav
+artifacts
+cache
