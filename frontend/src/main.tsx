@@ -21,7 +21,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const queryClient = new QueryClient();
 
 // 1. Get projectId at https://cloud.walletconnect.com
-const projectId = import.meta.env.VITE_WC_PROJECT_ID;
+const projectId = "7516507bb5b81201cbbe68a57234e4f3";
 
 // 2. Create wagmiConfig
 const metadata = {
