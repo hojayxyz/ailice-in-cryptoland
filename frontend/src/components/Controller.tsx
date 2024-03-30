@@ -2,10 +2,14 @@ import { useState } from "react";
 import Title from "./Title";
 import axios from "axios";
 import RecordMessage from "./RecordMessage";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useAccount } from "wagmi";
 
 const Controller = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
+  const { open, close } = useWeb3Modal();
+  const { address, isConnected } = useAccount();
 
   function createBlobURL(data: any) {
     const blob = new Blob([data], { type: "audio/mpeg" });
@@ -96,16 +100,25 @@ const Controller = () => {
               </div>
             );
           })}
-
-          {messages.length == 0 && !isLoading && (
+          {messages.length == 0 && !isLoading && !isConnected && (
             <div className="text-center font-light italic mt-10">
-              Send Ailice a message...
+              Connect to talk to Ailice
             </div>
           )}
-
+          {/* WalletConnect */}
+          {!isConnected && (
+            <div className="mt-2 text-center">
+              <button
+                className="px-6 py-3 text-white bg-slate-500 rounded-full hover:bg-slate-400 transition-all"
+                onClick={() => open({ view: "Networks" })}
+              >
+                Check Available Networks
+              </button>
+            </div>
+          )}
           {isLoading && (
             <div className="text-center font-light italic mt-10 animate-pulse">
-              Gimme a few seconds...
+              Gimme a sec...
             </div>
           )}
         </div>
@@ -113,9 +126,20 @@ const Controller = () => {
         {/* Recorder */}
         <div className="fixed bottom-0 w-full py-6 border-t text-center bg-gradient-to-r from-sky-500 to-green-500">
           <div className="flex justify-center items-center w-full">
-            <div>
-              <RecordMessage handleStop={handleStop} />
-            </div>
+            {isConnected ? (
+              <div>
+                <RecordMessage handleStop={handleStop} />
+              </div>
+            ) : (
+              <div>
+                <button
+                  className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all"
+                  onClick={() => open({ view: "Connect" })}
+                >
+                  Connect
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
