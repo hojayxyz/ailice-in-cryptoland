@@ -3,7 +3,8 @@ import Title from "./Title";
 import axios from "axios";
 import RecordMessage from "./RecordMessage";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useAccount } from "wagmi";
+import { useAccount, useSendTransaction } from "wagmi";
+import { parseEther } from "viem";
 
 const Controller = () => {
   const [isLoading, setIsLoading] = useState(false);
