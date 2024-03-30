@@ -5,7 +5,7 @@
 Change directory into backend
 
 ```shell
-cd chatbot/backend
+cd backend
 ```
 
 ### Setup virtual environment
@@ -90,7 +90,7 @@ Change directory into frontend
 
 ```shell
 cd ..
-cd chatbot/frontend
+cd frontend
 ```
 
 Install packages
