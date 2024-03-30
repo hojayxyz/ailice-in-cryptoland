@@ -7,9 +7,11 @@ import { useAccount } from "wagmi";
 
 const Controller = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
-  const { open, close } = useWeb3Modal();
+  const { open } = useWeb3Modal();
   const { address, isConnected } = useAccount();
+  const [credit, setCredit] = useState(10);
 
   function createBlobURL(data: any) {
     const blob = new Blob([data], { type: "audio/mpeg" });
@@ -53,12 +55,39 @@ const Controller = () => {
             // Play audio
             setIsLoading(false);
             audio.play();
+            setCredit((c) => c - 1);
           })
           .catch((err: any) => {
             console.error(err);
             setIsLoading(false);
+            setCredit((c) => c - 1);
           });
       });
+  };
+
+  // Reset conversation
+  const resetConversation = async () => {
+    setIsResetting(true);
+
+    await axios
+      .get("http://localhost:8000/reset", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((res) => {
+        if (res.status == 200) {
+          setMessages([]);
+        }
+      })
+      .catch((err) => {});
+
+    setIsResetting(false);
+  };
+
+  // Refill Credit
+  const buyCredit = () => {
+    setCredit((c) => c + 10);
   };
 
   return (
@@ -101,8 +130,43 @@ const Controller = () => {
             );
           })}
           {messages.length == 0 && !isLoading && !isConnected && (
-            <div className="text-center font-light italic mt-10">
-              Connect to talk to Ailice
+            <div className="flex justify-center items-center gap-2 font-light mt-10">
+              <span className="italic">Connect to talk to Ailice</span>
+              <span className="text-3xl">👩‍🦳</span>
+            </div>
+          )}
+          {isConnected && (
+            <div className="flex justify-center text-sm">
+              <span>Credit: </span>
+              {credit}
+            </div>
+          )}
+          {/* reset history */}
+          {isConnected && (
+            <div className="flex justify-center m-2">
+              <button
+                onClick={resetConversation}
+                className={
+                  "flex items-center gap-2 text-sm transition-all duration-300 text-blue-300 hover:text-pink-500 " +
+                  (isResetting && "animate-pulse")
+                }
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+                  />
+                </svg>
+                click to reset Ailice's memory 🧲
+              </button>
             </div>
           )}
           {/* WalletConnect */}
@@ -127,9 +191,23 @@ const Controller = () => {
         <div className="fixed bottom-0 w-full py-6 border-t text-center bg-gradient-to-r from-sky-500 to-green-500">
           <div className="flex justify-center items-center w-full">
             {isConnected ? (
-              <div>
-                <RecordMessage handleStop={handleStop} />
-              </div>
+              credit > 0 ? (
+                <div>
+                  <RecordMessage handleStop={handleStop} />
+                </div>
+              ) : (
+                <div>
+                  <button
+                    onClick={buyCredit}
+                    className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all"
+                  >
+                    Buy Credit
+                  </button>
+                  <button className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all">
+                    Buy Credit
+                  </button>
+                </div>
+              )
             ) : (
               <div>
                 <button
