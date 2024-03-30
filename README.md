@@ -39,7 +39,7 @@ pip3 install --upgrade pip
 Install required Python packages
 
 ```shell
-pip3 install openai python-decouple fastapi "uvicorn[standard]" python-multipart
+pip3 install openai python-decouple fastapi "uvicorn[standard]" python-multipart requests Pylance
 ```
 
 Or use this alternative method (although this alternative method might not work if using Windows)
