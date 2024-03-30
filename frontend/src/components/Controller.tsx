@@ -42,8 +42,8 @@ const Controller = () => {
             audio.src = createBlobURL(blob);
 
             // Append to audio
-            const rachelMessage = { sender: "rachel", blobUrl: audio.src };
-            messagesArr.push(rachelMessage);
+            const ailiceMessage = { sender: "ailice", blobUrl: audio.src };
+            messagesArr.push(ailiceMessage);
             setMessages(messagesArr);
 
             // Play audio
@@ -71,14 +71,14 @@ const Controller = () => {
                 key={index + audio.sender}
                 className={
                   "flex flex-col " +
-                  (audio.sender == "rachel" && "flex items-end")
+                  (audio.sender == "ailice" && "flex items-end")
                 }
               >
                 {/* Sender */}
                 <div className="mt-4 ">
                   <p
                     className={
-                      audio.sender == "rachel"
+                      audio.sender == "ailice"
                         ? "text-right mr-2 italic text-green-500"
                         : "ml-2 italic text-blue-500"
                     }
@@ -99,7 +99,7 @@ const Controller = () => {
 
           {messages.length == 0 && !isLoading && (
             <div className="text-center font-light italic mt-10">
-              Send Rachel a message...
+              Send Ailice a message...
             </div>
           )}
 
