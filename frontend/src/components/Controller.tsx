@@ -8,6 +8,7 @@ import {
   useSendTransaction,
   useWriteContract,
   useReadContract,
+  useChainId,
 } from "wagmi";
 import { parseEther } from "viem";
 import { abi } from "../contracts/Ailice.json";
@@ -16,9 +17,26 @@ const Controller = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
+
   const { open } = useWeb3Modal();
   const { address, isConnected } = useAccount();
   const { sendTransaction } = useSendTransaction();
+  const chainId = useChainId();
+  let CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
+
+  if (chainId === 8217) {
+    console.log("Klaytn mainnet");
+    CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
+  } else if (chainId === 44787) {
+    console.log("CELO testnet alfa");
+    CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
+  } else if (chainId === 245022926) {
+    console.log("NEON evm devnet");
+    CONTRACT_ADDRESS = "0xd5d8f9Abd23f726F8482693c567B26C87002Db5f";
+  } else {
+    console.log("ASTAR zkEVM mainnet");
+    CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
+  }
 
   const {
     data: hash,
@@ -80,7 +98,7 @@ const Controller = () => {
   // Read Credit Balance from contract
   const creditBalance = useReadContract({
     abi,
-    address: "0xA8798d3A2B5097192761d0319EeC18817c9BfcEC",
+    address: CONTRACT_ADDRESS,
     functionName: "getBalanceOf",
     args: [address],
   });
@@ -109,7 +127,7 @@ const Controller = () => {
     try {
       sendTransaction({
         to: "0x470b38298CDBB17E11375bAf4f36e33e78137e6f",
-        value: parseEther("0.01"),
+        value: parseEther("0.0001"),
       });
       await addCredit();
     } catch (error) {
@@ -120,7 +138,7 @@ const Controller = () => {
   const addCredit = async () => {
     try {
       writeContract({
-        address: "0xA8798d3A2B5097192761d0319EeC18817c9BfcEC",
+        address: CONTRACT_ADDRESS,
         abi,
         functionName: "buyCredit",
       });
@@ -132,7 +150,7 @@ const Controller = () => {
   const useCredit = async () => {
     try {
       writeContract({
-        address: "0xA8798d3A2B5097192761d0319EeC18817c9BfcEC",
+        address: CONTRACT_ADDRESS,
         abi,
         functionName: "useCredit",
       });
@@ -246,7 +264,7 @@ const Controller = () => {
                 <RecordMessage handleStop={handleStop} />
               </div>
             )}
-            {isConnected && Number(creditBalance.data) < 1 && (
+            {isConnected && (
               <div>
                 <button
                   onClick={payForCredit}

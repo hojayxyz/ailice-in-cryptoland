@@ -8,12 +8,8 @@ module.exports = {
     artifacts: "./src",
   },
   networks: {
-    zKatana: {
-      url: `https://rpc.zkatana.gelato.digital`,
-      accounts: [process.env.ACCOUNT_PRIVATE_KEY],
-    },
-    astarZkEvm: {
-      url: `https://rpc.startale.com/astar-zkevm`,
+    Klaytn: {
+      url: `https://klaytn-pokt.nodies.app`,
       accounts: [process.env.ACCOUNT_PRIVATE_KEY],
     },
   },

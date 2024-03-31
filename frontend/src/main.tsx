@@ -6,15 +6,8 @@ import "./index.css";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { defaultWagmiConfig } from "@web3modal/wagmi/react/config";
 import { WagmiProvider } from "wagmi";
-import {
-  astarZkatana,
-  mainnet,
-  astar,
-  neonDevnet,
-  neonMainnet,
-  klaytn,
-  sepolia,
-} from "wagmi/chains";
+import { ASTARzkEVM } from "./chain";
+import { neonDevnet, klaytn, celoAlfajores } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // 0. Setup queryClient
@@ -31,15 +24,7 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-const chains = [
-  mainnet,
-  astarZkatana,
-  astar,
-  neonDevnet,
-  neonMainnet,
-  klaytn,
-  sepolia,
-];
+const chains = [neonDevnet, klaytn, ASTARzkEVM, celoAlfajores];
 const config = defaultWagmiConfig({
   chains,
   projectId,
