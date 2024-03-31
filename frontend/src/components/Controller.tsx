@@ -3,8 +3,14 @@ import Title from "./Title";
 import axios from "axios";
 import RecordMessage from "./RecordMessage";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
-import { useAccount, useSendTransaction } from "wagmi";
+import {
+  useAccount,
+  useSendTransaction,
+  useWriteContract,
+  useReadContract,
+} from "wagmi";
 import { parseEther } from "viem";
+import { abi } from "../contracts/Ailice.json";
 
 const Controller = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -12,7 +18,13 @@ const Controller = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const { open } = useWeb3Modal();
   const { address, isConnected } = useAccount();
-  const [credit, setCredit] = useState(10);
+  const { sendTransaction } = useSendTransaction();
+
+  const {
+    data: hash,
+    isPending: isWriting,
+    writeContract,
+  } = useWriteContract();
 
   function createBlobURL(data: any) {
     const blob = new Blob([data], { type: "audio/mpeg" });
@@ -22,6 +34,7 @@ const Controller = () => {
 
   const handleStop = async (blobUrl: string) => {
     setIsLoading(true);
+    useCredit();
 
     // Append recorded message to messages
     const myMessage = { sender: "me", blobUrl };
@@ -56,16 +69,21 @@ const Controller = () => {
             // Play audio
             setIsLoading(false);
             audio.play();
-            setCredit((c) => c - 1);
           })
           .catch((err: any) => {
             console.error(err);
             setIsLoading(false);
-            setCredit((c) => c - 1);
           });
       });
   };
 
+  // Read Credit Balance from contract
+  const creditBalance = useReadContract({
+    abi,
+    address: "0xA8798d3A2B5097192761d0319EeC18817c9BfcEC",
+    functionName: "getBalanceOf",
+    args: [address],
+  });
   // Reset conversation
   const resetConversation = async () => {
     setIsResetting(true);
@@ -87,8 +105,40 @@ const Controller = () => {
   };
 
   // Refill Credit
-  const buyCredit = () => {
-    setCredit((c) => c + 10);
+  const payForCredit = async () => {
+    try {
+      sendTransaction({
+        to: "0x470b38298CDBB17E11375bAf4f36e33e78137e6f",
+        value: parseEther("0.01"),
+      });
+      await addCredit();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const addCredit = async () => {
+    try {
+      writeContract({
+        address: "0xA8798d3A2B5097192761d0319EeC18817c9BfcEC",
+        abi,
+        functionName: "buyCredit",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const useCredit = async () => {
+    try {
+      writeContract({
+        address: "0xA8798d3A2B5097192761d0319EeC18817c9BfcEC",
+        abi,
+        functionName: "useCredit",
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -137,9 +187,9 @@ const Controller = () => {
             </div>
           )}
           {isConnected && (
-            <div className="flex justify-center text-sm">
-              <span>Credit: </span>
-              {credit}
+            <div className="flex justify-center text-sm mt-3">
+              <span>Credit Balance : {Number(creditBalance.data)}</span>
+              {/* <button onClick={getBalance}>Get Balance</button> */}
             </div>
           )}
           {/* reset history */}
@@ -191,25 +241,23 @@ const Controller = () => {
         {/* Recorder */}
         <div className="fixed bottom-0 w-full py-6 border-t text-center bg-gradient-to-r from-sky-500 to-green-500">
           <div className="flex justify-center items-center w-full">
-            {isConnected ? (
-              credit > 0 ? (
-                <div>
-                  <RecordMessage handleStop={handleStop} />
-                </div>
-              ) : (
-                <div>
-                  <button
-                    onClick={buyCredit}
-                    className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all"
-                  >
-                    Buy Credit
-                  </button>
-                  <button className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all">
-                    Buy Credit
-                  </button>
-                </div>
-              )
-            ) : (
+            {isConnected && Number(creditBalance.data) > 0 && (
+              <div>
+                <RecordMessage handleStop={handleStop} />
+              </div>
+            )}
+            {isConnected && Number(creditBalance.data) < 1 && (
+              <div>
+                <button
+                  onClick={payForCredit}
+                  disabled={isWriting}
+                  className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all"
+                >
+                  {isWriting ? "Confirming" : "Buy Credit"}
+                </button>
+              </div>
+            )}
+            {!isConnected && (
               <div>
                 <button
                   className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all"
@@ -219,6 +267,7 @@ const Controller = () => {
                 </button>
               </div>
             )}
+            {/* {hash && <div>Transaction Hash: {hash}</div>} */}
           </div>
         </div>
       </div>
