@@ -12,9 +12,5 @@ module.exports = {
       url: `https://rpc.zkatana.gelato.digital`,
       accounts: [process.env.ACCOUNT_PRIVATE_KEY],
     },
-    astarZkEvm: {
-      url: `https://rpc.startale.com/astar-zkevm`,
-      accounts: [process.env.ACCOUNT_PRIVATE_KEY],
-    },
   },
 };

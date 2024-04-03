@@ -17,24 +17,27 @@ const Controller = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
-
   const { open } = useWeb3Modal();
   const { address, isConnected } = useAccount();
   const { sendTransaction } = useSendTransaction();
   const chainId = useChainId();
   let CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
+  let currentChain = "Ethereum";
 
   if (chainId === 8217) {
-    console.log("Klaytn mainnet");
+    currentChain = "Klaytn mainnet";
     CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
   } else if (chainId === 44787) {
-    console.log("CELO testnet alfa");
+    currentChain = "CELO Alfajores testnet";
     CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
   } else if (chainId === 245022926) {
-    console.log("NEON evm devnet");
+    currentChain = "NEON EVM devnet";
     CONTRACT_ADDRESS = "0xd5d8f9Abd23f726F8482693c567B26C87002Db5f";
+  } else if (chainId === 1261120) {
+    currentChain = "ASTAR zKatana";
+    CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
   } else {
-    console.log("ASTAR zkEVM mainnet");
+    currentChain = "Ethereum";
     CONTRACT_ADDRESS = "0xC6d1DaC42c853a7E657dA5CbeB5BD91aD208c333";
   }
 
@@ -162,7 +165,7 @@ const Controller = () => {
   return (
     <div className="h-screen overflow-y-hidden">
       {/* Title */}
-      <Title setMessages={setMessages} />
+      <Title setMessages={setMessages} currentChain={currentChain} />
 
       <div className="flex flex-col justify-between h-full overflow-y-scroll pb-96">
         {/* Conversation */}
@@ -205,14 +208,14 @@ const Controller = () => {
             </div>
           )}
           {isConnected && (
-            <div className="flex justify-center text-sm mt-3">
+            <div className="flex justify-center text-sm mt-8">
               <span>Credit Balance : {Number(creditBalance.data)}</span>
               {/* <button onClick={getBalance}>Get Balance</button> */}
             </div>
           )}
           {/* reset history */}
           {isConnected && (
-            <div className="flex justify-center m-2">
+            <div className="flex justify-center mt-5">
               <button
                 onClick={resetConversation}
                 className={
@@ -259,7 +262,33 @@ const Controller = () => {
         {/* Recorder */}
         <div className="fixed bottom-0 w-full py-6 border-t text-center bg-gradient-to-r from-sky-500 to-green-500">
           <div className="flex justify-center items-center w-full">
-            {isConnected && Number(creditBalance.data) > 0 && (
+            {isConnected ? (
+              Number(creditBalance.data) > 0 ? (
+                <div>
+                  <RecordMessage handleStop={handleStop} />
+                </div>
+              ) : (
+                <div>
+                  <button
+                    onClick={payForCredit}
+                    disabled={isWriting}
+                    className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all"
+                  >
+                    {isWriting ? "Confirming" : "Buy Credit"}
+                  </button>
+                </div>
+              )
+            ) : (
+              <div>
+                <button
+                  className="px-5 py-10 text-slate-800 font-semibold bg-sky-100 rounded-full hover:bg-sky-300 transition-all"
+                  onClick={() => open({ view: "Connect" })}
+                >
+                  Connect
+                </button>
+              </div>
+            )}
+            {/* {isConnected && Number(creditBalance.data) > 0 && (
               <div>
                 <RecordMessage handleStop={handleStop} />
               </div>
@@ -284,7 +313,7 @@ const Controller = () => {
                   Connect
                 </button>
               </div>
-            )}
+            )} */}
             {/* {hash && <div>Transaction Hash: {hash}</div>} */}
           </div>
         </div>

@@ -1,4 +1,20 @@
-# Instructions
+# Ailice in Cryptoland
+
+Ailice in Cryptoland is your trusted companion and expert advisor in the world of cryptocurrency. Seamlessly integrating with various Ethereum wallets and supporting multiple cryptocurrency chains, Ailice simplifies the complexities of the crypto landscape, providing personalized assistance and insights tailored to your needs.
+
+## Features
+
+- Seamless integration with Ethereum wallets
+- Support for multiple cryptocurrency chains
+- Multilingual support with translation capabilities
+- Natural voice interaction for an engaging user experience
+- Memory functionality to remember previous interactions
+
+## Getting Started
+
+To get started with Ailice in Cryptoland, simply follow these steps:
+
+Clone the repository:
 
 ## Setup backend
 
